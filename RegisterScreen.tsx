@@ -21,23 +21,41 @@ const RegisterScreen = ({ setIsLogin }: { setIsLogin: (isLogin: boolean) => void
       return;
     }
 
-    SQLite.openDatabase({ name: 'AppLockDB', location: 'default' }, (db) => {
-      db.transaction((tx) => {
-        tx.executeSql(
-            'INSERT INTO users (email, password, dob, gender) VALUES (?, ?, ?, ?)',
-            [email, password, dob, gender],
+    SQLite.openDatabase(
+      { name: 'AppLockDB', location: 'default' },
+      (db) => {
+        db.transaction((tx) => {
+          tx.executeSql(
+            'CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT, password TEXT, dob TEXT, gender TEXT)',
+            [],
             () => {
-              Alert.alert('Success', 'Registered successfully');
-              setIsLogin(true);
+              tx.executeSql(
+                'INSERT INTO users (email, password, dob, gender) VALUES (?, ?, ?, ?)',
+                [email, password, dob, gender],
+                () => {
+                  Alert.alert('Success', 'Registered successfully');
+                  setIsLogin(true);
+                },
+                (_, error) => {
+                  console.error('Registration failed:', error);
+                  Alert.alert('Error', 'Registration failed. Please try again.');
+                  return true;
+                }
+              );
             },
             (_, error) => {
-              console.error('Registration failed:', error); // Log the error
-              Alert.alert('Error', 'Registration failed');
+              console.error('Table creation failed:', error);
+              Alert.alert('Error', 'Database error. Please try again.'); 
               return true;
             }
           );
-      });
-    });
+        });
+      },
+      (error) => {
+        console.error('Database open error:', error);
+        Alert.alert('Error', 'Database connection failed. Please try again.');
+      }
+    );
   };
 
   return (
@@ -103,8 +121,9 @@ const styles = {
     borderRadius: 5,
   },
   picker: {
-    height: 40,
+    height: 50,
     marginBottom: 10,
+    backgroundColor: 'transparent',
   },
   switchText: {
     marginTop: 15,
