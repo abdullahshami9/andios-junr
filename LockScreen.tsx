@@ -1,20 +1,51 @@
-// LockScreen.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, Alert, Appearance } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+import SQLite from 'react-native-sqlite-storage';
 
 const LockScreen = ({ setIsLocked }: { setIsLocked: (locked: boolean) => void }) => {
   const [lockPassword, setLockPassword] = useState('');
+  const [db, setDb] = useState(null);
 
-  // Use Appearance to detect the color scheme
-  const colorScheme = Appearance.getColorScheme(); // 'light' or 'dark'
+  const colorScheme = Appearance.getColorScheme();
   const isDarkMode = colorScheme === 'dark';
+
+  useEffect(() => {
+    SQLite.openDatabase(
+      { name: 'AppLockDB', location: 'default' },
+      (db) => {
+        setDb(db); // Initialize the database
+      },
+      (error) => {
+        console.error('Database open error:', error);
+      }
+    );
+  }, []);
 
   const unlockApp = () => {
     if (lockPassword === '1234') {
       setIsLocked(false);
     } else {
       Alert.alert('Error', 'Wrong password');
+    }
+  };
+
+  const fetchData = () => {
+    if (db) { // Ensure the database is initialized
+      db.transaction((tx) => {
+        tx.executeSql(
+          'SELECT * FROM users',
+          [],
+          (_, results) => {
+            console.log('Data fetched:', results.rows.raw());
+          },
+          (_, error) => {
+            console.error('Error fetching data:', error);
+          }
+        );
+      });
+    } else {
+      console.error('Database is not initialized');
     }
   };
 
@@ -30,6 +61,7 @@ const LockScreen = ({ setIsLocked }: { setIsLocked: (locked: boolean) => void })
         onChangeText={setLockPassword}
       />
       <Button title="Unlock" onPress={unlockApp} />
+      <Button title="Fetch Data" onPress={fetchData} />
     </View>
   );
 };

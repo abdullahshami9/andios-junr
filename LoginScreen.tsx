@@ -23,7 +23,7 @@ const LoginScreen = ({ setIsLocked, setIsLogin }: { setIsLocked: (locked: boolea
           (_, results) => {
             if (results.rows.length > 0) {
               Alert.alert('Success', 'Logged in successfully');
-              setIsLocked(false);
+              setIsLocked(true);
             } else {
               Alert.alert('Error', 'Invalid credentials');
             }
