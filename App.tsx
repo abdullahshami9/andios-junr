@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { View, StatusBar, Appearance } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import LockScreen from './LockScreen';
+import LockScreen from './screens/LockScreen';
 import LoginScreen from './LoginScreen';
 import RegisterScreen from './RegisterScreen';
+import { createStackNavigator } from '@react-navigation/stack';
+
+const Stack = createStackNavigator();
 
 const App = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -26,11 +29,15 @@ const App = () => {
             barStyle={isDarkMode ? 'light-content' : 'dark-content'}
             backgroundColor={backgroundStyle.backgroundColor}
           />
-          {isLogin ? (
-            <LoginScreen setIsLocked={setIsLocked} setIsLogin={setIsLogin} />
-          ) : (
-            <RegisterScreen setIsLogin={setIsLogin} />
-          )}
+          <Stack.Navigator>
+            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen 
+              name="LockScreen" 
+              component={LockScreen}
+              options={{ headerShown: false }}
+            />
+          </Stack.Navigator>
         </>
       )}
     </View>
