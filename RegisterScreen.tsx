@@ -138,7 +138,7 @@ const RegisterScreen = ({ setIsLogin }: { setIsLogin: (isLogin: boolean) => void
                       useNativeDriver: true,
                     })
                   ]).start(() => {
-                    Alert.alert('Success', 'Registered successfully');
+                    // Alert.alert('Success', 'Registered successfully');
                     setIsLogin(true);
                   });
                 },

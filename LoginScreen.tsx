@@ -103,7 +103,7 @@ const LoginScreen = ({ setIsLocked, setIsLogin }: { setIsLocked: (locked: boolea
                   useNativeDriver: true,
                 })
               ]).start(() => {
-                Alert.alert('Success', 'Logged in successfully');
+                // Alert.alert('Success', 'Logged in successfully');
                 setIsLocked(true);
               });
             } else {
