@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert, TouchableOpacity, Appearance } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import SQLite from 'react-native-sqlite-storage';
+import { useNavigation } from '@react-navigation/native';
 
-const LoginScreen = ({ setIsLocked, setIsLogin }: { setIsLocked: (locked: boolean) => void, setIsLogin: (isLogin: boolean) => void }) => {
+const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const colorScheme = Appearance.getColorScheme(); // Use Appearance as fallback
   const isDarkMode = colorScheme === 'dark';
+  const navigation = useNavigation();
 
   const handleLogin = () => {
     if (!email || !password) {
@@ -23,7 +25,7 @@ const LoginScreen = ({ setIsLocked, setIsLogin }: { setIsLocked: (locked: boolea
           (_, results) => {
             if (results.rows.length > 0) {
               Alert.alert('Success', 'Logged in successfully');
-              setIsLocked(true);
+              navigation.replace('LockScreen');
             } else {
               Alert.alert('Error', 'Invalid credentials');
             }
@@ -53,8 +55,8 @@ const LoginScreen = ({ setIsLocked, setIsLogin }: { setIsLocked: (locked: boolea
         onChangeText={setPassword}
       />
       <Button title="Login" onPress={handleLogin} />
-      <TouchableOpacity onPress={() => setIsLogin(false)}>
-        <Text style={[styles.switchText, { color: isDarkMode ? Colors.white : Colors.black }]}>Switch to Register</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+        <Text style={[styles.switchText, { color: isDarkMode ? Colors.white : Colors.black }]}>Don't have an account? Sign up</Text>
       </TouchableOpacity>
     </View>
   );

@@ -6,7 +6,7 @@ import { Colors } from 'react-native/Libraries/NewAppScreen';
 import SQLite from 'react-native-sqlite-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const RegisterScreen = ({ setIsLogin, navigation }: { setIsLogin: (isLogin: boolean) => void, navigation: any }) => {
+const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [dob, setDob] = useState('');
@@ -84,7 +84,6 @@ const RegisterScreen = ({ setIsLogin, navigation }: { setIsLogin: (isLogin: bool
                 [email, password, dob, gender],
                 () => {
                   Alert.alert('Success', 'Registered successfully');
-                  setIsLogin(true);
                   navigation.replace('LockScreen');
                 },
                 (_, error) => {
@@ -178,7 +177,7 @@ const RegisterScreen = ({ setIsLogin, navigation }: { setIsLogin: (isLogin: bool
           <Text style={[styles.registerButtonText, { color: isDarkMode ? Colors.white : Colors.black }]}>Register</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.switchButton} onPress={() => setIsLogin(true)}>
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Text style={[styles.switchButtonText, { color: isDarkMode ? Colors.white : Colors.black }]}>Already have an account? Sign in</Text>
         </TouchableOpacity>
       </View>

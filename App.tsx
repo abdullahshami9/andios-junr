@@ -1,46 +1,56 @@
-import React, { useState } from 'react';
-import { View, StatusBar, Appearance } from 'react-native';
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { StatusBar, Appearance } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import LockScreen from './screens/LockScreen';
+import LockScreen from './LockScreen';
 import LoginScreen from './LoginScreen';
 import RegisterScreen from './RegisterScreen';
-import { createStackNavigator } from '@react-navigation/stack';
 
 const Stack = createStackNavigator();
 
 const App = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [isLocked, setIsLocked] = useState(false); // Set to false initially
-
-  const colorScheme = Appearance.getColorScheme(); // Use Appearance as fallback
+  const colorScheme = Appearance.getColorScheme();
   const isDarkMode = colorScheme === 'dark';
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
   return (
-    <View style={[backgroundStyle, { flex: 1 }]}>
-      {isLocked ? (
-        <LockScreen setIsLocked={setIsLocked} />
-      ) : (
-        <>
-          <StatusBar
-            barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-            backgroundColor={backgroundStyle.backgroundColor}
-          />
-          <Stack.Navigator>
-            <Stack.Screen name="Register" component={RegisterScreen} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen 
-              name="LockScreen" 
-              component={LockScreen}
-              options={{ headerShown: false }}
-            />
-          </Stack.Navigator>
-        </>
-      )}
-    </View>
+    <NavigationContainer>
+      <StatusBar
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        backgroundColor={isDarkMode ? Colors.darker : Colors.lighter}
+      />
+      <Stack.Navigator
+        initialRouteName="Login"
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+          },
+          headerTintColor: isDarkMode ? Colors.white : Colors.black,
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+      >
+        <Stack.Screen 
+          name="Login" 
+          component={LoginScreen}
+          options={{ title: 'Sign In' }}
+        />
+        <Stack.Screen 
+          name="Register" 
+          component={RegisterScreen}
+          options={{ title: 'Create Account' }}
+        />
+        <Stack.Screen 
+          name="LockScreen" 
+          component={LockScreen}
+          options={{ 
+            headerShown: false,
+            gestureEnabled: false 
+          }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 
