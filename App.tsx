@@ -5,11 +5,13 @@ import LockScreen from './LockScreen';
 import LoginScreen from './LoginScreen';
 import RegisterScreen from './RegisterScreen';
 import MediumScreen from './MediumScreen';
+import SurveyScreen from './SurveyScreen';
 
 const App = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isLocked, setIsLocked] = useState(false);
   const [showMedium, setShowMedium] = useState(false);
+  const [showSurvey, setShowSurvey] = useState(false);
 
   const colorScheme = Appearance.getColorScheme();
   const isDarkMode = colorScheme === 'dark';
@@ -33,6 +35,8 @@ const App = () => {
         <LockScreen setIsLocked={setIsLocked} />
       ) : showMedium ? (
         <MediumScreen setIsLocked={handleLockScreen} />
+      ) : showSurvey ? (
+        <SurveyScreen onComplete={() => setIsLocked(true)} />
       ) : (
         <>
           <StatusBar
@@ -40,9 +44,15 @@ const App = () => {
             backgroundColor={backgroundStyle.backgroundColor}
           />
           {isLogin ? (
-            <LoginScreen setIsLocked={handleLoginSuccess} setIsLogin={setIsLogin} />
+            <LoginScreen 
+              setIsLocked={handleLoginSuccess} 
+              setIsLogin={setIsLogin} 
+            />
           ) : (
-            <RegisterScreen setIsLogin={setIsLogin} />
+            <RegisterScreen 
+              setIsLogin={setIsLogin} 
+              onRegisterSuccess={() => setShowSurvey(true)} 
+            />
           )}
         </>
       )}

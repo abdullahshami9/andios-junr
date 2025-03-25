@@ -22,7 +22,12 @@ import LinearGradient from 'react-native-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
 
-const RegisterScreen = ({ setIsLogin }: { setIsLogin: (isLogin: boolean) => void }) => {
+interface RegisterScreenProps {
+  setIsLogin: (isLogin: boolean) => void;
+  onRegisterSuccess?: () => void;
+}
+
+const RegisterScreen = ({ setIsLogin, onRegisterSuccess }: RegisterScreenProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [dob, setDob] = useState('');
@@ -139,7 +144,11 @@ const RegisterScreen = ({ setIsLogin }: { setIsLogin: (isLogin: boolean) => void
                     })
                   ]).start(() => {
                     // Alert.alert('Success', 'Registered successfully');
-                    setIsLogin(true);
+                    // setIsLogin(true);
+                     // Instead of setIsLogin(true), we'll call a new prop to show survey
+                      if (onRegisterSuccess) {
+                        onRegisterSuccess();
+                      }
                   });
                 },
                 (_, error) => {
