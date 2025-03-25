@@ -358,8 +358,8 @@ const RobotAnimation: React.FC<RobotAnimationProps> = ({ emotion = 'lookout' }) 
 const styles = StyleSheet.create({
   robotContainer: {
     position: 'absolute',
-    top: 5,
-    left: width / 2 - 37,
+    top: 15,
+    left: width / 2 - 50,
     zIndex: 10,
   },
   robotBody: {

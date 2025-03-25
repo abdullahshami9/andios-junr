@@ -7,22 +7,17 @@ import {
   Dimensions,
   StatusBar,
   SafeAreaView,
-  Alert,
-  Modal,
-  TouchableWithoutFeedback,
-  Appearance,
-  Switch,
-  Easing,
-  Image
+  Image,
+  Appearance
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import { styles } from './MediumScreenStyles';
 import RobotAnimation from './RobotAnimation1';
 import { NotificationsTab } from './NotificationsTab';
 import { AppsTab } from './AppsTab';
 import { PaymentsTab } from './PaymentsTab';
 import { TasksTab } from './TasksTab';
+import SettingsTab from './SettingsTab';
 
 const { height } = Dimensions.get('window');
 
@@ -72,24 +67,20 @@ const MediumScreen = ({ setIsLocked }) => {
   const [paymentMethods, setPaymentMethods] = useState(MOCK_PAYMENT_METHODS);
   const [transactions, setTransactions] = useState(MOCK_TRANSACTIONS);
   
-  const [settings, setSettings] = useState({
-    darkMode: Appearance.getColorScheme() === 'dark',
-    notifications: true,
-    biometricAuth: true,
-    dataSync: false,
-    autoLock: true
-  });
-  
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
-  const tabIndicatorAnim = useRef(new Animated.Value(0)).current;
   
   const colorScheme = Appearance.getColorScheme();
   const isDarkMode = colorScheme === 'dark';
   
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
-  const settingsOverlayAnim = useRef(new Animated.Value(0)).current;
-  const settingsContentAnim = useRef(new Animated.Value(height)).current;
+  const [settings, setSettings] = useState({
+    darkMode: isDarkMode,
+    notifications: true,
+    biometricAuth: true,
+    dataSync: false,
+    autoLock: true
+  });
 
   useEffect(() => {
     Animated.parallel([
@@ -121,16 +112,6 @@ const MediumScreen = ({ setIsLocked }) => {
     return () => clearInterval(notificationInterval);
   }, []);
 
-  useEffect(() => {
-    Animated.timing(tabIndicatorAnim, {
-      toValue: currentTab === 'notification' ? 0 : 
-               currentTab === 'apps' ? 0.33 : 
-               currentTab === 'payments' ? 0.67 : 1,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
-  }, [currentTab]);
-
   const expandNotification = (notification) => {
     setExpandedNotification(notification.id);
   };
@@ -139,192 +120,12 @@ const MediumScreen = ({ setIsLocked }) => {
     setExpandedNotification(null);
   };
 
-  const toggleSetting = (setting) => {
-    setSettings(prev => ({
-      ...prev,
-      [setting]: !prev[setting]
-    }));
-  };
-
   const setDefaultPaymentMethod = (id) => {
     setPaymentMethods(prev => 
       prev.map(method => ({
         ...method,
         default: method.id === id
       }))
-    );
-  };
-
-  const openSettings = () => {
-    setIsSettingsVisible(true);
-    Animated.parallel([
-      Animated.timing(settingsOverlayAnim, {
-        toValue: 1,
-        duration: 300,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true
-      }),
-      Animated.timing(settingsContentAnim, {
-        toValue: 0,
-        duration: 400,
-        easing: Easing.out(Easing.back(1)),
-        useNativeDriver: true
-      })
-    ]).start();
-  };
-
-  const closeSettings = () => {
-    Animated.parallel([
-      Animated.timing(settingsOverlayAnim, {
-        toValue: 0,
-        duration: 300,
-        easing: Easing.in(Easing.ease),
-        useNativeDriver: true
-      }),
-      Animated.timing(settingsContentAnim, {
-        toValue: height,
-        duration: 350,
-        easing: Easing.in(Easing.back(1)),
-        useNativeDriver: true
-      })
-    ]).start(() => {
-      setIsSettingsVisible(false);
-    });
-  };
-
-  const renderSettingItem = ({ title, description, value, onToggle }) => {
-    return (
-      <View style={styles.settingItem}>
-        <View style={styles.settingTextContainer}>
-          <Text style={[styles.settingTitle, { color: isDarkMode ? '#FFFFFF' : '#333333' }]}>
-            {title}
-          </Text>
-          <Text style={[styles.settingDescription, { color: isDarkMode ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)' }]}>
-            {description}
-          </Text>
-        </View>
-        <Switch
-          value={value}
-          onValueChange={onToggle}
-          trackColor={{ false: isDarkMode ? '#555' : '#D0D0D0', true: '#8E54E9' }}
-          thumbColor={value ? '#FFFFFF' : '#F4F3F4'}
-        />
-      </View>
-    );
-  };
-
-  const renderSettingsOverlay = () => {
-    const overlayOpacity = settingsOverlayAnim.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0, 0.8]
-    });
-
-    const contentTranslate = settingsContentAnim;
-
-    return (
-      <Modal
-        transparent={true}
-        visible={isSettingsVisible}
-        animationType="none"
-        onRequestClose={closeSettings}
-        statusBarTranslucent={true}
-      >
-        <Animated.View 
-          style={[
-            styles.settingsOverlay,
-            { 
-              opacity: overlayOpacity,
-              backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.6)'
-            }
-          ]}
-        >
-          <TouchableWithoutFeedback onPress={closeSettings}>
-            <View style={styles.settingsOverlayBackground} />
-          </TouchableWithoutFeedback>
-
-          <Animated.View 
-            style={[
-              styles.settingsContainer,
-              { 
-                transform: [{ translateY: contentTranslate }],
-                backgroundColor: isDarkMode ? '#1A1A2E' : '#F5F7FF'
-              }
-            ]}
-          >
-            <LinearGradient
-              colors={isDarkMode ? ['#1A1A2E', '#16213E'] : ['#F5F7FF', '#E8F0FE']}
-              style={styles.settingsGradient}
-            >
-              <SafeAreaView style={styles.settingsSafeArea}>
-                <View style={[
-                  styles.settingsHeader, 
-                  { 
-                    borderBottomColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
-                  }
-                ]}>
-                  <Text style={[styles.settingsTitle, { color: isDarkMode ? '#FFFFFF' : '#333333' }]}>
-                    Settings
-                  </Text>
-                  <TouchableOpacity 
-                    style={styles.closeSettingsButton}
-                    onPress={closeSettings}
-                  >
-                    <Icon name="close" size={24} color={isDarkMode ? '#FFFFFF' : '#333333'} />
-                  </TouchableOpacity>
-                </View>
-
-                <View style={styles.settingsContent}>
-                  {renderSettingItem({
-                    title: 'Dark Mode',
-                    description: 'Enable dark theme for the app',
-                    value: settings.darkMode,
-                    onToggle: () => toggleSetting('darkMode')
-                  })}
-                  
-                  {renderSettingItem({
-                    title: 'Notifications',
-                    description: 'Receive push notifications',
-                    value: settings.notifications,
-                    onToggle: () => toggleSetting('notifications')
-                  })}
-                  
-                  {renderSettingItem({
-                    title: 'Biometric Authentication',
-                    description: 'Use fingerprint or face ID to unlock',
-                    value: settings.biometricAuth,
-                    onToggle: () => toggleSetting('biometricAuth')
-                  })}
-                  
-                  {renderSettingItem({
-                    title: 'Data Synchronization',
-                    description: 'Sync data across devices',
-                    value: settings.dataSync,
-                    onToggle: () => toggleSetting('dataSync')
-                  })}
-                  
-                  {renderSettingItem({
-                    title: 'Auto-Lock',
-                    description: 'Automatically lock app when inactive',
-                    value: settings.autoLock,
-                    onToggle: () => toggleSetting('autoLock')
-                  })}
-                  
-                  <TouchableOpacity 
-                    style={[styles.logoutButton, { backgroundColor: isDarkMode ? 'rgba(255, 107, 107, 0.2)' : 'rgba(255, 107, 107, 0.1)' }]}
-                    onPress={() => Alert.alert('Logout', 'Are you sure you want to log out?', [
-                      { text: 'Cancel', style: 'cancel' },
-                      { text: 'Logout', style: 'destructive', onPress: () => console.log('Logout pressed') }
-                    ])}
-                  >
-                    <Icon name="logout" size={20} color="#FF6B6B" />
-                    <Text style={styles.logoutText}>Logout</Text>
-                  </TouchableOpacity>
-                </View>
-              </SafeAreaView>
-            </LinearGradient>
-          </Animated.View>
-        </Animated.View>
-      </Modal>
     );
   };
 
@@ -350,13 +151,13 @@ const MediumScreen = ({ setIsLocked }) => {
               }
             ]}
           >
-            <View style={[styles.header, { paddingTop: 20 }]}>
+            <View style={[styles.header, { paddingTop: 10 }]}>
               <Text style={[styles.headerTitle, { color: isDarkMode ? '#888888' : '#888888' }]}>
                 Junr
               </Text>
               <RobotAnimation emotion='lookout'/>
               <View style={styles.headerButtons}>
-                <TouchableOpacity onPress={openSettings}>
+                <TouchableOpacity onPress={() => setIsSettingsVisible(true)}>
                   <Image 
                     source={require('./assets/icons/setting.png')} 
                     style={[
@@ -368,92 +169,173 @@ const MediumScreen = ({ setIsLocked }) => {
               </View>
             </View>
             
-            <View style={styles.tabContainer}>
+            {/* Modern Navigation Tabs */}
+            <View style={[styles.tabContainer, { 
+              backgroundColor: isDarkMode ? 'rgba(30, 30, 50, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+              borderRadius: 20,
+              marginHorizontal: 16,
+              marginBottom: 12,
+              paddingVertical: 4,
+              elevation: 8,
+              shadowColor: isDarkMode ? '#8E54E9' : '#4776E6',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.2,
+              shadowRadius: 6,
+            }]}>
               <TouchableOpacity 
-                style={styles.tabButton}
+                style={[styles.tabButton, { paddingVertical: 12 }]}
                 onPress={() => setCurrentTab('notification')}
               >
-                <Text 
-                  style={[
+                <Image
+                  source={currentTab === 'notification' ? 
+                    require('./assets/icons/notification.png') : 
+                    require('./assets/icons/notification.png')}
+                  style={{
+                    width: 24,
+                    height: 24,
+                    tintColor: currentTab === 'notification' ? 
+                      (isDarkMode ? '#8E54E9' : '#4776E6') : 
+                      (isDarkMode ? '#BBBBBB' : '#666666')
+                  }}
+                />
+                {currentTab === 'notification' && (
+                  <Text style={[
                     styles.tabText, 
                     { 
-                      color: currentTab === 'notification' 
-                        ? (isDarkMode ? '#FFFFFF' : '#333333') 
-                        : (isDarkMode ? '#BBBBBB' : '#666666')
+                      color: currentTab === 'notification' ? 
+                        (isDarkMode ? '#8E54E9' : '#4776E6') : 
+                        (isDarkMode ? '#BBBBBB' : '#666666'),
+                      fontSize: 12,
+                      marginTop: 4,
+                      fontWeight: '600'
                     }
-                  ]}
-                >
-                  Notifications
-                </Text>
+                  ]}>
+                    Notifications
+                  </Text>
+                )}
               </TouchableOpacity>
               
               <TouchableOpacity 
-                style={styles.tabButton}
+                style={[styles.tabButton, { paddingVertical: 12 }]}
                 onPress={() => setCurrentTab('apps')}
               >
-                <Text 
-                  style={[
+                <Image
+                  source={currentTab === 'apps' ? 
+                    require('./assets/icons/app.png') : 
+                    require('./assets/icons/app.png')}
+                  style={{
+                    width: 24,
+                    height: 24,
+                    tintColor: currentTab === 'apps' ? 
+                      (isDarkMode ? '#8E54E9' : '#4776E6') : 
+                      (isDarkMode ? '#BBBBBB' : '#666666')
+                  }}
+                />
+                {currentTab === 'apps' && (
+                  <Text style={[
                     styles.tabText, 
                     { 
-                      color: currentTab === 'apps' 
-                        ? (isDarkMode ? '#FFFFFF' : '#333333') 
-                        : (isDarkMode ? '#BBBBBB' : '#666666')
+                      color: currentTab === 'apps' ? 
+                        (isDarkMode ? '#8E54E9' : '#4776E6') : 
+                        (isDarkMode ? '#BBBBBB' : '#666666'),
+                      fontSize: 12,
+                      marginTop: 4,
+                      fontWeight: '600'
                     }
-                  ]}
-                >
-                  Apps
-                </Text>
+                  ]}>
+                    Apps
+                  </Text>
+                )}
               </TouchableOpacity>
 
               <TouchableOpacity 
-                style={styles.tabButton}
+                style={[styles.tabButton, { paddingVertical: 12 }]}
                 onPress={() => setCurrentTab('payments')}
               >
-                <Text 
-                  style={[
+                <Image
+                  source={currentTab === 'payments' ? 
+                    require('./assets/icons/payment.png') : 
+                    require('./assets/icons/payment.png')}
+                  style={{
+                    width: 24,
+                    height: 24,
+                    tintColor: currentTab === 'payments' ? 
+                      (isDarkMode ? '#8E54E9' : '#4776E6') : 
+                      (isDarkMode ? '#BBBBBB' : '#666666')
+                  }}
+                />
+                {currentTab === 'payments' && (
+                  <Text style={[
                     styles.tabText, 
                     { 
-                      color: currentTab === 'payments' 
-                        ? (isDarkMode ? '#FFFFFF' : '#333333') 
-                        : (isDarkMode ? '#BBBBBB' : '#666666')
+                      color: currentTab === 'payments' ? 
+                        (isDarkMode ? '#8E54E9' : '#4776E6') : 
+                        (isDarkMode ? '#BBBBBB' : '#666666'),
+                      fontSize: 12,
+                      marginTop: 4,
+                      fontWeight: '600'
                     }
-                  ]}
-                >
-                  Payments
-                </Text>
+                  ]}>
+                    Payments
+                  </Text>
+                )}
               </TouchableOpacity>
 
               <TouchableOpacity 
-                style={styles.tabButton}
+                style={[styles.tabButton, { paddingVertical: 12 }]}
                 onPress={() => setCurrentTab('general')}
               >
-                <Text 
-                  style={[
+                <Image
+                  source={currentTab === 'general' ? 
+                    require('./assets/icons/general.png') : 
+                    require('./assets/icons/general.png')}
+                  style={{
+                    width: 24,
+                    height: 24,
+                    tintColor: currentTab === 'general' ? 
+                      (isDarkMode ? '#8E54E9' : '#4776E6') : 
+                      (isDarkMode ? '#BBBBBB' : '#666666')
+                  }}
+                />
+                {currentTab === 'general' && (
+                  <Text style={[
                     styles.tabText, 
                     { 
-                      color: currentTab === 'general' 
-                        ? (isDarkMode ? '#FFFFFF' : '#333333') 
-                        : (isDarkMode ? '#BBBBBB' : '#666666')
+                      color: currentTab === 'general' ? 
+                        (isDarkMode ? '#8E54E9' : '#4776E6') : 
+                        (isDarkMode ? '#BBBBBB' : '#666666'),
+                      fontSize: 12,
+                      marginTop: 4,
+                      fontWeight: '600'
                     }
-                  ]}
-                >
-                  General
-                </Text>
+                  ]}>
+                    General
+                  </Text>
+                )}
               </TouchableOpacity>
               
-              <Animated.View 
+              {/* Commented out the tab bar indicator */}
+              {/* <Animated.View 
                 style={[
-                  styles.tabIndicator,
                   {
+                    position: 'absolute',
+                    bottom: 4,
+                    height: 3,
                     backgroundColor: isDarkMode ? '#8E54E9' : '#4776E6',
+                    borderRadius: 3,
                     left: tabIndicatorAnim.interpolate({
                       inputRange: [0, 0.33, 0.67, 1],
-                      outputRange: ['0%', '25%', '50%', '75%']
+                      outputRange: ['2%', '26%', '50%', '74%']
                     }),
-                    width: '25%'
+                    width: '24%',
+                    elevation: 8,
+                    shadowColor: isDarkMode ? '#8E54E9' : '#4776E6',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.4,
+                    shadowRadius: 4,
                   }
                 ]}
-              />
+              /> */}
             </View>
             
             <View style={styles.contentArea}>
@@ -487,7 +369,13 @@ const MediumScreen = ({ setIsLocked }) => {
         </SafeAreaView>
       </LinearGradient>
       
-      {renderSettingsOverlay()}
+      <SettingsTab
+        visible={isSettingsVisible}
+        onClose={() => setIsSettingsVisible(false)}
+        settings={settings}
+        setSettings={setSettings}
+        isDarkMode={isDarkMode}
+      />
     </View>
   );
 };

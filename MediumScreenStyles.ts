@@ -24,6 +24,7 @@ export const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: '700',
+    color: '#1A1A1A', // Deep gray for title
   },
   headerButtons: {
     flexDirection: 'row',
@@ -33,9 +34,11 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     height: 50,
     borderRadius: 25,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(240, 240, 240, 0.8)', // Light gray background
     marginBottom: 20,
     position: 'relative',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.05)', // Subtle border
   },
   tabButton: {
     flex: 1,
@@ -312,9 +315,10 @@ export const styles = StyleSheet.create({
     height: 50,
     borderRadius: 12,
     marginTop: 30,
+    backgroundColor: 'rgba(255, 107, 107, 0.1)',
   },
   logoutText: {
-    color: '#FF6B6B',
+    color: '#D93025',
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
