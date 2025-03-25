@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@react-native-picker/picker": "^2.11.0",
+    "expo-camera": "^16.0.18",
+    "expo-face-detector": "^13.0.2",
     "react": "19.0.0",
     "react-native": "0.78.1",
     "react-native-linear-gradient": "^2.8.3",
