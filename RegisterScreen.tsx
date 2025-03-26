@@ -19,6 +19,9 @@ import { Picker } from '@react-native-picker/picker';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import SQLite from 'react-native-sqlite-storage';
 import LinearGradient from 'react-native-linear-gradient';
+import DatePicker from 'react-native-date-picker';
+import { format } from 'date-fns';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const { width, height } = Dimensions.get('window');
 
@@ -32,6 +35,11 @@ const RegisterScreen = ({ setIsLogin, onRegisterSuccess }: RegisterScreenProps) 
   const [password, setPassword] = useState('');
   const [dob, setDob] = useState('');
   const [gender, setGender] = useState('Male');
+
+  // Add these state variables near your other state declarations
+  const [date, setDate] = useState(new Date());
+  const [open, setOpen] = useState(false);
+
   const [errors, setErrors] = useState({
     email: '',
     password: '',
@@ -253,23 +261,51 @@ const RegisterScreen = ({ setIsLogin, onRegisterSuccess }: RegisterScreenProps) 
               {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
             </View>
             
+            // Replace your current Date of Birth input group with this:
             <View style={styles.inputGroup}>
               <Text style={[styles.label, { color: isDarkMode ? '#BBBBBB' : '#666666' }]}>Date of Birth</Text>
-              <TextInput
+              
+              <TouchableOpacity 
                 style={[
                   styles.input,
+                  styles.dateInput,
                   { 
                     backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.03)',
-                    color: isDarkMode ? '#FFFFFF' : '#333333',
                     borderColor: errors.dob ? '#FF6B6B' : isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
                   }
                 ]}
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor={isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.3)'}
-                value={dob}
-                onChangeText={validateDob}
-              />
+                onPress={() => setOpen(true)}
+              >
+                <Text style={{ color: isDarkMode ? '#FFFFFF' : '#333333' }}>
+                  {dob || 'Select your date of birth'}
+                </Text>
+                <Icon name="calendar-today" size={20} color={isDarkMode ? '#BBBBBB' : '#666666'} />
+              </TouchableOpacity>
+              
               {errors.dob ? <Text style={styles.errorText}>{errors.dob}</Text> : null}
+
+              <DatePicker
+                modal
+                open={open}
+                date={date}
+                mode="date"
+                maximumDate={new Date()}
+                minimumDate={new Date(1900, 0, 1)}
+                onConfirm={(selectedDate) => {
+                  setOpen(false);
+                  setDate(selectedDate);
+                  const formattedDate = format(selectedDate, 'yyyy-MM-dd');
+                  setDob(formattedDate);
+                  validateDob(formattedDate);
+                }}
+                onCancel={() => {
+                  setOpen(false);
+                }}
+                theme={isDarkMode ? 'dark' : 'light'}
+                textColor={isDarkMode ? '#FFFFFF' : '#000000'}
+                dividerHeight={1}
+                androidVariant="nativeAndroid" // For more native Android look
+              />
             </View>
             
             <View style={styles.inputGroup}>
@@ -416,6 +452,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
     fontWeight: '500',
+  },
+  dateInput: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
   },
 });
 

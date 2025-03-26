@@ -36,7 +36,7 @@ const App = () => {
       ) : showMedium ? (
         <MediumScreen setIsLocked={handleLockScreen} />
       ) : showSurvey ? (
-        <SurveyScreen onComplete={() => setIsLocked(true)} />
+        <SurveyScreen onComplete={() => setShowMedium(true)} />
       ) : (
         <>
           <StatusBar
