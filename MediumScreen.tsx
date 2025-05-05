@@ -13,6 +13,7 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import { styles } from './MediumScreenStyles';
 import RobotAnimation from './RobotAnimation1';
+import DynamicIsland from './DynamicIsland';
 import { NotificationsTab } from './NotificationsTab';
 import { AppsTab } from './AppsTab';
 import { PaymentsTab } from './PaymentsTab';
@@ -128,14 +129,17 @@ const MediumScreen = ({ setIsLocked }) => {
       }))
     );
   };
-
+  
   return (
     <View style={styles.container}>
+      <DynamicIsland />
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor="transparent"
         translucent
       />
+
+
       
       <LinearGradient
         colors={isDarkMode ? ['#1A1A2E', '#16213E'] : ['#E8F0FE', '#C7D2FE']}
@@ -155,7 +159,8 @@ const MediumScreen = ({ setIsLocked }) => {
               <Text style={[styles.headerTitle, { color: isDarkMode ? '#888888' : '#888888' }]}>
                 Junr
               </Text>
-              <RobotAnimation emotion='lookout'/>
+              {/* <RobotAnimation emotion='lookout'/>  */}
+              {/* <DynamicIsland /> */}
               <View style={styles.headerButtons}>
                 <TouchableOpacity onPress={() => setIsSettingsVisible(true)}>
                   <Image 
